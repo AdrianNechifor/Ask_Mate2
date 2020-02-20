@@ -71,8 +71,7 @@ def question_details(question_id):
     answers = data_manager.get_question_with_answers(question_id)
     comments = data_manager.get_comment_to_question(question_id)
     question_tags = data_manager.display_tags(question_id)
-    username_temp = data_manager.get_username_by_user_id(answers[0]['user_id'])
-    username = username_temp['username']
+    username = data_manager.get_username_by_user_id(answers[0]['user_id'])
     return render_template('question.html', answers=answers, question_id=int(question_id), question_tags=question_tags, comments=comments, username=username)
 
 

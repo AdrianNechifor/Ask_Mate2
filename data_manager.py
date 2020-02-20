@@ -202,7 +202,7 @@ def display_tags(cursor, question_id):
     tags_list = []
     tags_list.append(tags)
     return tags_list
-print(display_tags(1))
+
 
 @database_common.connection_handler
 def list_tags(cursor):
@@ -250,32 +250,33 @@ def list_comments_by_user_id(cursor, user_id):
 
 @database_common.connection_handler
 def get_user_id_by_username(cursor,username):
-    cursor.execute('''
+    cursor.execute("""
         SELECT id FROM users
         WHERE username = %(username)s;
-    ''', {'username': username})
+    """, {'username': username})
     user = cursor.fetchone()
     return user['id']
 
 
 @database_common.connection_handler
 def get_user_id_by_username(cursor,username):
-    cursor.execute('''
+    cursor.execute("""
         SELECT id FROM users
         WHERE username = %(username)s;
-    ''', {'username': username})
+    """, {'username': username})
     user_id= cursor.fetchone()
     return user_id
 
 @database_common.connection_handler
 def get_username_by_user_id(cursor,user_id):
-    cursor.execute('''
+    cursor.execute("""
         SELECT username FROM users
         WHERE id = %(user_id)s;
-    ''', {'user_id': user_id})
-    username= cursor.fetchone()
+    """, {'user_id': user_id})
+    username = cursor.fetchone()
     return username
 
+@database_common.connection_handler
 def get_all_users(cursor):
     cursor.execute("""
                     SELECT * FROM users;
