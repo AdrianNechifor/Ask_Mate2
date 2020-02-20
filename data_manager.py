@@ -92,16 +92,10 @@ def add_new_question(cursor, data):
                     INSERT INTO question ( submission_time, view_number, vote_number, title, message, user_id)
                     VALUES ( date_trunc('seconds', CURRENT_TIMESTAMP), 0, 0, %s, %s, %s) ;
                    """,
-<<<<<<< HEAD
-                   (data['title'],
-                    data['message'])
-                   )
-=======
                   (data['title'],
                     data['message'],
                     data['user_id'])
                     )
->>>>>>> 34634139cff945121bde8cc2ef6634b3a8f9e3b3
 
 
 @database_common.connection_handler
@@ -110,17 +104,11 @@ def add_new_answer(cursor, data):
                     INSERT INTO answer ( submission_time, vote_number, question_id, message, user_id)
                     VALUES ( date_trunc('seconds', CURRENT_TIMESTAMP), 0, %s, %s, %s) ;
                    """,
-<<<<<<< HEAD
-                   (data['question_id'],
-                    data['message'])
-                   )
-
-=======
                   (data['question_id'],
                     data['message'],
                    data['user_id'])
                     )
->>>>>>> 34634139cff945121bde8cc2ef6634b3a8f9e3b3
+
 
 @database_common.connection_handler
 def add_user(cursor, data):
@@ -167,7 +155,6 @@ def login(cursor, username):
         SELECT password FROM users
         WHERE username = %(username)s;
     """, {'username': username})
-<<<<<<< HEAD
     password = cursor.fetchone()
     return password
 
@@ -199,9 +186,77 @@ def delete_comment(cursor, question_id, comment_id):
                     DELETE FROM comment WHERE question_id=%(question_id)s AND id=%(id)s;
                     """, {'question_id': question_id,
                           'id': comment_id})
-=======
     password= cursor.fetchone()
     return password
+
+
+@database_common.connection_handler
+def display_tags(cursor, question_id):
+    cursor.execute("""
+        SELECT name FROM tag
+        LEFT JOIN question_tag on tag.id = question_tag.tag_id
+        WHERE question_tag.question_id=%(question_id)s;
+                    """,
+                   {'question_id': question_id})
+    tags = cursor.fetchone()
+    tags_list = []
+    tags_list.append(tags)
+    return tags_list
+print(display_tags(1))
+
+@database_common.connection_handler
+def list_tags(cursor):
+    cursor.execute("""
+        SELECT tag.name, COUNT(qt.question_id) as number_of_questions FROM tag
+        LEFT JOIN question_tag qt on tag.id = qt.tag_id
+        GROUP BY tag.name
+    """)
+    all_tags = cursor.fetchall()
+    return all_tags
+
+
+@database_common.connection_handler
+def list_questions_by_user_id(cursor, user_id):
+    cursor.execute("""
+        SELECT DISTINCT users.username,q.title, q.message, q.id FROM users LEFT JOIN question q on users.id = q.user_id
+        WHERE users.id = %(user_id)s;
+    """, {'user_id': user_id})
+    questions_by_user = cursor.fetchall()
+    return questions_by_user
+
+@database_common.connection_handler
+def list_answers_by_user_id(cursor, user_id):
+    cursor.execute("""
+        SELECT DISTINCT answer.message,q.title, q.id FROM answer LEFT JOIN question q on answer.question_id =q.id
+        WHERE answer.user_id = %(user_id)s;
+    """, {'user_id': user_id})
+    answers_by_user = cursor.fetchall()
+    return answers_by_user
+
+@database_common.connection_handler
+def list_comments_by_user_id(cursor, user_id):
+    cursor.execute("""
+        SELECT DISTINCT comment.message,q.title, q.id FROM comment LEFT JOIN question q on comment.question_id =q.id
+        WHERE comment.user_id = %(user_id)s;
+    """, {'user_id': user_id})
+    comments_by_user = cursor.fetchall()
+    return comments_by_user
+
+# @database_common.connection_handler
+# def list_answers_by_user_id(cursor, user_id):
+#     cursor.execute("""
+#         SELECT
+#     """)
+
+@database_common.connection_handler
+def get_user_id_by_username(cursor,username):
+    cursor.execute('''
+        SELECT id FROM users
+        WHERE username = %(username)s;
+    ''', {'username': username})
+    user = cursor.fetchone()
+    return user['id']
+
 
 @database_common.connection_handler
 def get_user_id_by_username(cursor,username):
@@ -295,5 +350,3 @@ def get_user_id_by_username(cursor, username):
                    {'username': username})
     user_id = cursor.fetchone()
     return user_id
-
->>>>>>> 34634139cff945121bde8cc2ef6634b3a8f9e3b3
